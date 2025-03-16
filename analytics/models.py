@@ -12,3 +12,11 @@ class Analytic(models.Model):
   YouTubeComment = models.PositiveIntegerField()
   niconicoComment = models.PositiveIntegerField()
   niconicoMylist = models.PositiveIntegerField()
+
+  def totalStatistic(self):
+    statistic = {
+      "view": self.YouTubeView + self.niconicoView,
+      "like": self.YouTubeLike + self.niconicoLike,
+      "comment": self.YouTubeComment + self.niconicoComment
+    }
+    return statistic
