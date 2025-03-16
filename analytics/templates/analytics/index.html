@@ -53,14 +53,15 @@
     <br>
 
     <div>
+      <a href="{% url 'index' %}?order=id">Sort by Video Id</a> |
       <a href="{% url 'index' %}?order=view">Sort by View Count</a> |
-      <a href="{% url 'index' %}?order=like">Sort by Like Date</a> | 
-      <a href="{% url 'index' %}?order=comment">Sort by Comment Date</a>
+      <a href="{% url 'index' %}?order=like">Sort by Like Count</a> | 
+      <a href="{% url 'index' %}?order=comment">Sort by Comment Count</a>
     </div>
 
     {% for analytic in analytics %}
     <div class="text">
-      <h2>{{ analytic.title }}</h2>
+      <h2>{{ analytic.videoTitle }}</h2>
       <ul>
         <li>Get at: {{ analytic.get_at }}</li>
         <li>View<ul>

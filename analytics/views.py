@@ -17,7 +17,14 @@ def index(request):
       niconicoMylist=request.POST['niconicoMylist']
     )
     analytic.save()
-  analytics = Analytic.objects.all()
+  if request.GET.get('order') == 'view':
+    analytics = Analytic.objects.order_by('-YouTubeView')
+  elif request.GET.get('order') == 'like':
+    analytics = Analytic.objects.order_by('-YouTubeLike')
+  elif request.GET.get('order') == 'comment':
+    analytics = Analytic.objects.order_by('-YouTubeComment')
+  else:
+    analytics = Analytic.objects.order_by('-videoId')
   context = {
     'analytics': analytics
   }
