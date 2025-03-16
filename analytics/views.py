@@ -1,5 +1,6 @@
 from analytics.models import Analytic
 from datetime import date
+from django.http import Http404
 from django.shortcuts import render
 
 def index(request):
@@ -29,3 +30,11 @@ def index(request):
     'analytics': analytics
   }
   return render(request, "analytics/index.html", context)
+
+def detail(request, analytic_id):
+  try: analytic = Analytic.objects.get(pk=analytic_id)
+  except Analytic.DoesNotExist: raise Http404("Task doen not exist")
+  context = {
+    'analytic': analytic
+  }
+  return render(request, 'analytics/detail.html', context)
