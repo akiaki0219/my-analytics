@@ -1,6 +1,6 @@
 from analytics.models import Analytic
 from datetime import date
-from django.test import TestCase
+from django.test import TestCase, Client
 
 
 class SampleTestCase(TestCase):
@@ -56,3 +56,30 @@ class AnalyticModelTestCase(TestCase):
     self.assertEqual(analytic.totalStatistic()["view"], 20)
     self.assertEqual(analytic.totalStatistic()["like"], 20)
     self.assertEqual(analytic.totalStatistic()["comment"], 20)
+
+
+class AnalyticsViewTestCase(TestCase):
+  def test_index_get(self):
+    client = Client()
+    response = client.get('/')
+    self.assertEqual(response.status_code, 200)
+    self.assertEqual(response.templates[0].name, 'analytics/index.html')
+    self.assertEqual(len(response.context["analytics"]), 0)
+  
+  def test_index_post(self):
+    client = Client()
+    data = {
+      "videoId": 0,
+      "videoTitle": 'test',
+      "YouTubeView": 0,
+      "niconicoView": 0,
+      "YouTubeLike": 0,
+      "niconicoLike": 0,
+      "YouTubeComment": 0,
+      "niconicoComment": 0,
+      "niconicoMylist": 0
+    }
+    response = client.post('/', data)
+    self.assertEqual(response.status_code, 200)
+    self.assertEqual(response.templates[0].name, 'analytics/index.html')
+    self.assertEqual(len(response.context["analytics"]), 1)
