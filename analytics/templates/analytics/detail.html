@@ -1,0 +1,33 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <title>My Analytics</title>
+    <meta charset="UTF-8">
+    <meta name="author" content="Akkiy">
+  </head>
+  <body>
+    <div class="text">
+      <h1>{{ analytic.videoTitle }}</h1>
+      <ul>
+        <li>Get at: {{ analytic.get_at }}</li>
+        <li>View<ul>
+          <li>YouTube: {{ analytic.YouTubeView }}</li>
+          <li>niconico: {{ analytic.niconicoView }}</li>
+        </ul></li>
+        <li>Like<ul>
+          <li>YouTube: {{ analytic.YouTubeLike }}</li>
+          <li>niconico: {{ analytic.niconicoLike }}</li>
+        </ul></li>
+        <li>Comment<ul>
+          <li>YouTube: {{ analytic.YouTubeComment }}</li>
+          <li>niconico: {{ analytic.niconicoComment }}</li>
+        </ul></li>
+        <li>MyList: {{ analytic.niconicoMylist }}</li>
+      </ul>
+    </div>
+    <div>
+      <a href="{% url 'index' %}">Top</a>
+    </div>
+  </body>
+</html>

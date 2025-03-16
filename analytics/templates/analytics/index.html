@@ -61,7 +61,7 @@
 
     {% for analytic in analytics %}
     <div class="text">
-      <h2>{{ analytic.videoTitle }}</h2>
+      <h2><a href="{% url 'detail' analytic.id %}">{{ analytic.videoTitle }}</a></h2>
       <ul>
         <li>Get at: {{ analytic.get_at }}</li>
         <li>View<ul>
