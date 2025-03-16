@@ -1,0 +1,83 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <title>My Analytics</title>
+    <meta charset="UTF-8">
+    <meta name="author" content="Akkiy">
+  </head>
+  <body>
+    <h1>My Analytics</h1>
+    <form action="{% url 'index' %}" method="post">
+      {% csrf_token %}
+      <div>
+        <label for="idInput">Video Id</label><br>
+        <input id="idInput" name="videoId" type="number" placeholder="Input video id">
+      </div>
+      <div>
+        <label for="titleInput">Title</label><br>
+        <input id="titleInput" name="videoTitle" type="text" placeholder="Input video title">
+      </div>
+      <div>
+        <label for="youtubeviewInput">YouTube View</label><br>
+        <input id="youtubeviewInput" name="YouTubeView" type="number" placeholder="Input youtube view count">
+      </div>
+      <div>
+        <label for="youtubelikeInput">YouTube Like</label><br>
+        <input id="youtubelikeInput" name="YouTubeLike" type="number" placeholder="Input youtube like count">
+      </div>
+      <div>
+        <label for="youtubecommentInput">YouTube Comment</label><br>
+        <input id="youtubeCommentInput" name="YouTubeComment" type="number" placeholder="Input youtube comment count">
+      </div>
+      <div>
+        <label for="niconicoviewInput">niconico View</label><br>
+        <input id="niconicoviewInput" name="niconicoView" type="number" placeholder="Input niconico view count">
+      </div>
+      <div>
+        <label for="niconicolikeInput">niconico Like</label><br>
+        <input id="niconicolikeInput" name="niconicoLike" type="number" placeholder="Input niconico like count">
+      </div>
+      <div>
+        <label for="niconicocommentInput">niconico Comment</label><br>
+        <input id="niconicoCommentInput" name="niconicoComment" type="number" placeholder="Input niconico comment count">
+      </div>
+      <div>
+        <label for="niconicomylistInput">niconico Mylist</label><br>
+        <input id="niconicomylistInput" name="niconicoMylist" type="number" placeholder="Input niconico mylist count">
+      </div>
+      <div>
+        <button type="submit">Submit</button>
+      </div>
+    </form>
+    <br>
+
+    <div>
+      <a href="{% url 'index' %}?order=view">Sort by View Count</a> |
+      <a href="{% url 'index' %}?order=like">Sort by Like Date</a> | 
+      <a href="{% url 'index' %}?order=comment">Sort by Comment Date</a>
+    </div>
+
+    {% for analytic in analytics %}
+    <div class="text">
+      <h2>{{ analytic.title }}</h2>
+      <ul>
+        <li>Get at: {{ analytic.get_at }}</li>
+        <li>View<ul>
+          <li>YouTube: {{ analytic.YouTubeView }}</li>
+          <li>niconico: {{ analytic.niconicoView }}</li>
+        </ul></li>
+        <li>Like<ul>
+          <li>YouTube: {{ analytic.YouTubeLike }}</li>
+          <li>niconico: {{ analytic.niconicoLike }}</li>
+        </ul></li>
+        <li>Comment<ul>
+          <li>YouTube: {{ analytic.YouTubeComment }}</li>
+          <li>niconico: {{ analytic.niconicoComment }}</li>
+        </ul></li>
+        <li>MyList: {{ analytic.niconicoMylist }}</li>
+      </ul>
+    </div>
+    {% endfor %}
+  </body>
+</html>
