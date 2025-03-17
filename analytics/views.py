@@ -1,22 +1,25 @@
+from analytics.fetch import FetchAnalytics
 from analytics.models import Analytic
-from datetime import date
 from django.http import Http404
 from django.shortcuts import render
 
 def index(request):
   if request.method == "POST":
-    analytic = Analytic(
-      videoId=request.POST['videoId'],
-      get_at=date.today(),
-      YouTubeView=request.POST['YouTubeView'],
-      YouTubeLike=request.POST['YouTubeLike'],
-      YouTubeComment=request.POST['YouTubeComment'],
-      niconicoView=request.POST['niconicoView'],
-      niconicoLike=request.POST['niconicoLike'],
-      niconicoComment=request.POST['niconicoComment'],
-      niconicoMylist=request.POST['niconicoMylist']
-    )
-    analytic.save()
+    fetchAnalytics = FetchAnalytics()
+    for i in fetchAnalytics:
+      fetchAnalytic = fetchAnalytics[i]
+      analytic = Analytic(
+        videoId = fetchAnalytic['videoId'],
+        get_at = fetchAnalytic['get_at'],
+        YouTubeView = int(fetchAnalytic['analytic']['view']['YouTube']),
+        YouTubeLike = int(fetchAnalytic['analytic']['like']['YouTube']),
+        YouTubeComment = int(fetchAnalytic['analytic']['comment']['YouTube']),
+        niconicoView = int(fetchAnalytic['analytic']['view']['niconico']),
+        niconicoLike = int(fetchAnalytic['analytic']['like']['niconico']),
+        niconicoComment = int(fetchAnalytic['analytic']['comment']['niconico']),
+        niconicoMylist = int(fetchAnalytic['analytic']['mylist']['niconico'])
+      )
+      analytic.save()
   sort_options = {
     'id': 'videoId',
     'view': 'YouTubeView',
