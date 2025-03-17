@@ -7,7 +7,6 @@ def index(request):
   if request.method == "POST":
     analytic = Analytic(
       videoId=request.POST['videoId'],
-      videoTitle=request.POST['videoTitle'],
       get_at=date.today(),
       YouTubeView=request.POST['YouTubeView'],
       YouTubeLike=request.POST['YouTubeLike'],
@@ -18,14 +17,15 @@ def index(request):
       niconicoMylist=request.POST['niconicoMylist']
     )
     analytic.save()
-  if request.GET.get('order') == 'view':
-    analytics = Analytic.objects.order_by('-YouTubeView')
-  elif request.GET.get('order') == 'like':
-    analytics = Analytic.objects.order_by('-YouTubeLike')
-  elif request.GET.get('order') == 'comment':
-    analytics = Analytic.objects.order_by('-YouTubeComment')
-  else:
-    analytics = Analytic.objects.order_by('-videoId')
+  sort_options = {
+    'id': 'videoId',
+    'view': 'YouTubeView',
+    'like': 'YouTubeLike',
+    'comment': 'YouTubeComment'
+  }
+  sort_field = sort_options.get(request.GET.get('sort'), 'videoId')
+  order = '' if request.GET.get('order')=='asc' else '-'
+  analytics = Analytic.objects.order_by('{}{}'.format(order, sort_field))
   context = {
     'analytics': analytics
   }

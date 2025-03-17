@@ -15,10 +15,6 @@
         <input id="idInput" name="videoId" type="number" placeholder="Input video id">
       </div>
       <div>
-        <label for="titleInput">Title</label><br>
-        <input id="titleInput" name="videoTitle" type="text" placeholder="Input video title">
-      </div>
-      <div>
         <label for="youtubeviewInput">YouTube View</label><br>
         <input id="youtubeviewInput" name="YouTubeView" type="number" placeholder="Input youtube view count">
       </div>
@@ -51,17 +47,40 @@
       </div>
     </form>
     <br>
-
-    <div>
-      <a href="{% url 'index' %}?order=id">Sort by Video Id</a> |
-      <a href="{% url 'index' %}?order=view">Sort by View Count</a> |
-      <a href="{% url 'index' %}?order=like">Sort by Like Count</a> | 
-      <a href="{% url 'index' %}?order=comment">Sort by Comment Count</a>
-    </div>
-
+    <form action="{% url 'index' %}" method="get">
+      <h2>Sort Option</h2>
+      <div>
+        <input type="radio" id="videoId" name="sort" value="id"/>
+        <label for="videoId">Video Id</label>
+      </div>
+      <div>
+        <input type="radio" id="viewCount" name="sort" value="view" />
+        <label for="viewCount">View Count</label>
+      </div>
+      <div>
+        <input type="radio" id="likeCount" name="sort" value="like" />
+        <label for="likeCount">Like Count</label>
+      </div>
+      <div>
+        <input type="radio" id="commentCount" name="sort" value="comment" />
+        <label for="commentCount">Comment Count</label>
+      </div>
+      <h2>Sort Order</h2>
+      <div>
+        <input type="radio" id="asc" name="order" value="asc" />
+        <label for="asc">Ascending</label>
+      </div>
+      <div>
+        <input type="radio" id="desc" name="order" value="desc"/>
+        <label for="desc">Descending</label>
+      </div>
+      <div>
+        <button type="submit">Apply</button>
+      </div>
+    </form>
     {% for analytic in analytics %}
     <div class="text">
-      <h2><a href="{% url 'detail' analytic.id %}">{{ analytic.videoTitle }}</a></h2>
+      <h2><a href="{% url 'detail' analytic.id %}">{{ analytic.videoId }}</a></h2>
       <ul>
         <li>Get at: {{ analytic.get_at }}</li>
         <li>View<ul>
