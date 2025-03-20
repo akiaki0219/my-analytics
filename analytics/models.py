@@ -1,7 +1,9 @@
+import uuid
 from django.db import models
 from django.utils import timezone
 
 class Analytic(models.Model):
+  id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
   videoId = models.IntegerField()
   get_at = models.DateField(default=timezone.now)
   YouTubeView = models.PositiveIntegerField()

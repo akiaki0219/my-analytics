@@ -21,6 +21,7 @@ from analytics import views as analytics_views
 urlpatterns = [
 	path('admin/', admin.site.urls),
 	path('', analytics_views.index, name='index'),
-  path('top', analytics_views.index, name='top'),
-  path('<int:analytic_id>', analytics_views.detail, name='detail'),
+  path('top/', analytics_views.index, name='top'),
+  path('<uuid:analytic_id>/', analytics_views.detail, name='detail'),
+  path('fetch/', analytics_views.fetch, name='fetch'),
 ]
