@@ -1,5 +1,6 @@
 from analytics.fetch import FetchAnalytics
 from analytics.models import Analytic
+from datetime import date
 from django.http import Http404
 from django.shortcuts import render
 
@@ -28,7 +29,7 @@ def index(request):
   }
   sort_field = sort_options.get(request.GET.get('sort'), 'videoId')
   order = '' if request.GET.get('order')=='asc' else '-'
-  analytics = Analytic.objects.order_by('{}{}'.format(order, sort_field))
+  analytics = Analytic.objects.filter(get_at=date.today()).order_by('{}{}'.format(order, sort_field))
   context = {
     'analytics': analytics
   }
