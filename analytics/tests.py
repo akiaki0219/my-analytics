@@ -1,5 +1,6 @@
 from analytics.models import Analytic
 from datetime import date
+from dateutil.relativedelta import relativedelta
 from django.test import TestCase, Client
 
 
@@ -57,12 +58,34 @@ class AnalyticModelTestCase(TestCase):
 
 
 class AnalyticsViewTestCase(TestCase):
-  def test_index_get(self):
+  def test_index_get0(self):
     client = Client()
     response = client.get('/')
     self.assertEqual(response.status_code, 200)
     self.assertEqual(response.templates[0].name, 'analytics/index.html')
     self.assertEqual(len(response.context["analytics"]), 0)
+  
+  def test_index_get1(self):
+    analytic = Analytic(videoId=0, get_at=date.today(), YouTubeView=3, YouTubeLike=2, YouTubeComment=1, niconicoView=4, niconicoLike=7, niconicoComment=6, niconicoMylist=5)
+    analytic.save()
+    client = Client()
+    response = client.get('/')
+    self.assertEqual(response.status_code, 200)
+    self.assertEqual(response.templates[0].name, 'analytics/index.html')
+    self.assertEqual(response.context["analytics"][0], analytic)
+    self.assertEqual(len(response.context["analytics"]), 1)
+
+  def test_index_get2(self):
+    analytic0 = Analytic(videoId=0, get_at=date.today(), YouTubeView=3, YouTubeLike=2, YouTubeComment=1, niconicoView=4, niconicoLike=7, niconicoComment=6, niconicoMylist=5)
+    analytic0.save()
+    analytic1 = Analytic(videoId=1, get_at=date.today()+relativedelta(days=-1), YouTubeView=0, YouTubeLike=3, YouTubeComment=2, niconicoView=5, niconicoLike=4, niconicoComment=7, niconicoMylist=6)
+    analytic1.save()
+    client = Client()
+    response = client.get('/')
+    self.assertEqual(response.status_code, 200)
+    self.assertEqual(response.templates[0].name, 'analytics/index.html')
+    self.assertEqual(response.context["analytics"][0], analytic0)
+    self.assertEqual(len(response.context["analytics"]), 1)
 
   def test_index_get_sort_id(self):
     analytic0 = Analytic(videoId=0, get_at=date.today(), YouTubeView=3, YouTubeLike=2, YouTubeComment=1, niconicoView=4, niconicoLike=7, niconicoComment=6, niconicoMylist=5)
@@ -314,12 +337,12 @@ class AnalyticsViewTestCase(TestCase):
     analytic = Analytic(videoId=0, get_at=date.today(), YouTubeView=0, YouTubeLike=0, YouTubeComment=0, niconicoView=0, niconicoLike=0, niconicoComment=0, niconicoMylist=0)
     analytic.save()
     client = Client()
-    response = client.get('/{}/'.format(analytic.pk))
+    response = client.get('/{}'.format(analytic.pk))
     self.assertEqual(response.status_code, 200)
     self.assertEqual(response.templates[0].name, 'analytics/detail.html')
     self.assertEqual(response.context["analytic"], analytic)
 
   def test_detail_get_fail(self):
     client = Client()
-    response = client.get('/1/')
+    response = client.get('/1')
     self.assertEqual(response.status_code, 404)
