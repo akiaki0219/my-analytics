@@ -1,6 +1,9 @@
 import datetime, json, os, requests
+from dotenv import load_dotenv
 from googleapiclient.discovery import build
 from supabase import create_client, Client
+
+load_dotenv()
 
 def fetchYouTubeAPI(videoId: str|None):
   if videoId is None:
@@ -11,7 +14,7 @@ def fetchYouTubeAPI(videoId: str|None):
       "commentCount": 0
     }
   else:
-    response = build('youtube', 'v3', developerKey=os.environ.get("YOUTUBE_KEY")).videos().list(part='statistics', id=videoId).execute()
+    response = build('youtube', 'v3', developerKey=os.getenv("YOUTUBE_KEY")).videos().list(part='statistics', id=videoId).execute()
     statistics = response["items"][0]["statistics"]
   return statistics
 def fetchNicoNicoAPI(videoId: str|None):
@@ -33,7 +36,7 @@ def fetchSupabaseAPI(supabaseClient: Client):
   return data
 
 def FetchAnalytics():
-  supabaseClient: Client = create_client(os.environ.get("SUPABASE_URL"), os.environ.get("SUPABASE_KEY"))
+  supabaseClient: Client = create_client(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_KEY"))
   videoList = fetchSupabaseAPI(supabaseClient)
   analytics = {}
   id = 0
@@ -69,20 +72,3 @@ def FetchAnalytics():
     }
     id += 1
   return analytics
-
-"""
-fetchAnalytics = FetchAnalytics()
-fetchAnalytic = fetchAnalytics[1]
-analytic = {
-  'videoId': fetchAnalytic['videoId'],
-  'get_at': fetchAnalytic['get_at'],
-  'YouTubeView': fetchAnalytic['analytic']['view']['YouTube'],
-  'YouTubeLike': fetchAnalytic['analytic']['like']['YouTube'],
-  'YouTubeComment': fetchAnalytic['analytic']['comment']['YouTube'],
-  'niconicoView': fetchAnalytic['analytic']['view']['niconico'],
-  'niconicoLike': fetchAnalytic['analytic']['like']['niconico'],
-  'niconicoComment': fetchAnalytic['analytic']['comment']['niconico'],
-  'niconicoMylist': fetchAnalytic['analytic']['mylist']['niconico']
-}
-print(analytic)
-"""

@@ -8,8 +8,7 @@
   </head>
   <body>
     <h1>My Analytics</h1>
-    <form action="{% url 'index' %}" method="post">
-      {% csrf_token %}
+    <form action="{% url 'fetch' %}" method="get">
       <div>
         <button type="submit">Fetch Latest Analytics</button>
       </div>

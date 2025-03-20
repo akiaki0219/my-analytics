@@ -326,23 +326,29 @@ class AnalyticsViewTestCase(TestCase):
     self.assertEqual(response.context["analytics"][1], analytic1)
     self.assertEqual(response.context["analytics"][2], analytic0)
     self.assertEqual(response.context["analytics"][3], analytic3)
-  
-  def test_index_post(self):
-    client = Client()
-    response = client.post('/')
-    self.assertEqual(response.status_code, 200)
-    self.assertEqual(response.templates[0].name, 'analytics/index.html')
 
   def test_detail_get_success(self):
     analytic = Analytic(videoId=0, get_at=date.today(), YouTubeView=0, YouTubeLike=0, YouTubeComment=0, niconicoView=0, niconicoLike=0, niconicoComment=0, niconicoMylist=0)
     analytic.save()
     client = Client()
-    response = client.get('/{}'.format(analytic.pk))
+    response = client.get('/{}/'.format(analytic.pk))
     self.assertEqual(response.status_code, 200)
     self.assertEqual(response.templates[0].name, 'analytics/detail.html')
     self.assertEqual(response.context["analytic"], analytic)
 
   def test_detail_get_fail(self):
     client = Client()
-    response = client.get('/1')
+    response = client.get('/1/')
     self.assertEqual(response.status_code, 404)
+
+  def test_fetch_get(self):
+    client = Client()
+    response = client.get('/fetch/')
+    self.assertEqual(response.status_code, 200)
+    self.assertEqual(response.templates[0].name, 'analytics/fetch.html')
+
+  def test_fetch_post(self):
+    client = Client()
+    response = client.post('/fetch/')
+    self.assertEqual(response.status_code, 302)
+    self.assertEqual(response.url, '/top/')

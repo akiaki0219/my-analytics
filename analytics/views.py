@@ -2,25 +2,9 @@ from analytics.fetch import FetchAnalytics
 from analytics.models import Analytic
 from datetime import date
 from django.http import Http404
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 
 def index(request):
-  if request.method == "POST":
-    fetchAnalytics = FetchAnalytics()
-    for i in fetchAnalytics:
-      fetchAnalytic = fetchAnalytics[i]
-      analytic = Analytic(
-        videoId = fetchAnalytic['videoId'],
-        get_at = fetchAnalytic['get_at'],
-        YouTubeView = int(fetchAnalytic['analytic']['view']['YouTube']),
-        YouTubeLike = int(fetchAnalytic['analytic']['like']['YouTube']),
-        YouTubeComment = int(fetchAnalytic['analytic']['comment']['YouTube']),
-        niconicoView = int(fetchAnalytic['analytic']['view']['niconico']),
-        niconicoLike = int(fetchAnalytic['analytic']['like']['niconico']),
-        niconicoComment = int(fetchAnalytic['analytic']['comment']['niconico']),
-        niconicoMylist = int(fetchAnalytic['analytic']['mylist']['niconico'])
-      )
-      analytic.save()
   sort_options = {
     'id': 'videoId',
     'view': 'YouTubeView',
@@ -42,3 +26,23 @@ def detail(request, analytic_id):
     'analytic': analytic
   }
   return render(request, 'analytics/detail.html', context)
+
+def fetch(request):
+  if request.method == "POST":
+    fetchAnalytics = FetchAnalytics()
+    for i in fetchAnalytics:
+      fetchAnalytic = fetchAnalytics[i]
+      analytic = Analytic(
+        videoId = fetchAnalytic['videoId'],
+        get_at = fetchAnalytic['get_at'],
+        YouTubeView = int(fetchAnalytic['analytic']['view']['YouTube']),
+        YouTubeLike = int(fetchAnalytic['analytic']['like']['YouTube']),
+        YouTubeComment = int(fetchAnalytic['analytic']['comment']['YouTube']),
+        niconicoView = int(fetchAnalytic['analytic']['view']['niconico']),
+        niconicoLike = int(fetchAnalytic['analytic']['like']['niconico']),
+        niconicoComment = int(fetchAnalytic['analytic']['comment']['niconico']),
+        niconicoMylist = int(fetchAnalytic['analytic']['mylist']['niconico'])
+      )
+      analytic.save()
+    return redirect(index)
+  return render(request, 'analytics/fetch.html')
