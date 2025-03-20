@@ -11,39 +11,7 @@
     <form action="{% url 'index' %}" method="post">
       {% csrf_token %}
       <div>
-        <label for="idInput">Video Id</label><br>
-        <input id="idInput" name="videoId" type="number" placeholder="Input video id">
-      </div>
-      <div>
-        <label for="youtubeviewInput">YouTube View</label><br>
-        <input id="youtubeviewInput" name="YouTubeView" type="number" placeholder="Input youtube view count">
-      </div>
-      <div>
-        <label for="youtubelikeInput">YouTube Like</label><br>
-        <input id="youtubelikeInput" name="YouTubeLike" type="number" placeholder="Input youtube like count">
-      </div>
-      <div>
-        <label for="youtubecommentInput">YouTube Comment</label><br>
-        <input id="youtubeCommentInput" name="YouTubeComment" type="number" placeholder="Input youtube comment count">
-      </div>
-      <div>
-        <label for="niconicoviewInput">niconico View</label><br>
-        <input id="niconicoviewInput" name="niconicoView" type="number" placeholder="Input niconico view count">
-      </div>
-      <div>
-        <label for="niconicolikeInput">niconico Like</label><br>
-        <input id="niconicolikeInput" name="niconicoLike" type="number" placeholder="Input niconico like count">
-      </div>
-      <div>
-        <label for="niconicocommentInput">niconico Comment</label><br>
-        <input id="niconicoCommentInput" name="niconicoComment" type="number" placeholder="Input niconico comment count">
-      </div>
-      <div>
-        <label for="niconicomylistInput">niconico Mylist</label><br>
-        <input id="niconicomylistInput" name="niconicoMylist" type="number" placeholder="Input niconico mylist count">
-      </div>
-      <div>
-        <button type="submit">Submit</button>
+        <button type="submit">Fetch Latest Analytics</button>
       </div>
     </form>
     <br>

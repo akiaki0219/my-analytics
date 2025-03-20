@@ -64,23 +64,6 @@ class AnalyticsViewTestCase(TestCase):
     self.assertEqual(response.templates[0].name, 'analytics/index.html')
     self.assertEqual(len(response.context["analytics"]), 0)
 
-  def test_index_post(self):
-    client = Client()
-    data = {
-      "videoId": 0,
-      "YouTubeView": 0,
-      "niconicoView": 0,
-      "YouTubeLike": 0,
-      "niconicoLike": 0,
-      "YouTubeComment": 0,
-      "niconicoComment": 0,
-      "niconicoMylist": 0
-    }
-    response = client.post('/', data)
-    self.assertEqual(response.status_code, 200)
-    self.assertEqual(response.templates[0].name, 'analytics/index.html')
-    self.assertEqual(len(response.context["analytics"]), 1)
-
   def test_index_get_sort_id(self):
     analytic0 = Analytic(videoId=0, get_at=date.today(), YouTubeView=3, YouTubeLike=2, YouTubeComment=1, niconicoView=4, niconicoLike=7, niconicoComment=6, niconicoMylist=5)
     analytic0.save()
@@ -320,6 +303,12 @@ class AnalyticsViewTestCase(TestCase):
     self.assertEqual(response.context["analytics"][1], analytic1)
     self.assertEqual(response.context["analytics"][2], analytic0)
     self.assertEqual(response.context["analytics"][3], analytic3)
+  
+  def test_index_post(self):
+    client = Client()
+    response = client.post('/')
+    self.assertEqual(response.status_code, 200)
+    self.assertEqual(response.templates[0].name, 'analytics/index.html')
 
   def test_detail_get_success(self):
     analytic = Analytic(videoId=0, get_at=date.today(), YouTubeView=0, YouTubeLike=0, YouTubeComment=0, niconicoView=0, niconicoLike=0, niconicoComment=0, niconicoMylist=0)

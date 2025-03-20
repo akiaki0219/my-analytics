@@ -1,1 +1,5 @@
-Django==4.2.2
+Django==5.1.7
+supabase==2.13.0
+google-api-python-client==2.164.0
+google-auth-oauthlib==1.2.1
+google-auth-httplib2==0.2.0
