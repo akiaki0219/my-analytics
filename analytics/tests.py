@@ -1,7 +1,9 @@
+import os
 from analytics.models import Analytic
 from datetime import date
 from dateutil.relativedelta import relativedelta
 from django.test import TestCase, Client
+from supabase import create_client
 
 
 class SampleTestCase(TestCase):
@@ -347,8 +349,25 @@ class AnalyticsViewTestCase(TestCase):
     self.assertEqual(response.status_code, 200)
     self.assertEqual(response.templates[0].name, 'analytics/fetch.html')
 
-  def test_fetch_post(self):
+  def test_fetch_post0(self):
     client = Client()
     response = client.post('/fetch/')
     self.assertEqual(response.status_code, 302)
     self.assertEqual(response.url, '/top/')
+
+  def test_fetch_post1(self):
+    supabaseClient = create_client(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_KEY"))
+    videoList = supabaseClient.table('video').select('id, YouTube, niconico').eq('public', True).execute().data
+    client = Client()
+    response = client.post('/fetch/')
+    response = client.get('/top/')
+    self.assertEqual(len(response.context["analytics"]), len(videoList))
+
+  def test_fetch_post2(self):
+    supabaseClient = create_client(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_KEY"))
+    videoList = supabaseClient.table('video').select('id, YouTube, niconico').eq('public', True).execute().data
+    client = Client()
+    for _ in range(2):
+      response = client.post('/fetch/')
+    response = client.get('/top/')
+    self.assertEqual(len(response.context["analytics"]), len(videoList))

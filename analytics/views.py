@@ -30,19 +30,32 @@ def detail(request, analytic_id):
 def fetch(request):
   if request.method == "POST":
     fetchAnalytics = FetchAnalytics()
-    for i in fetchAnalytics:
-      fetchAnalytic = fetchAnalytics[i]
-      analytic = Analytic(
-        videoId = fetchAnalytic['videoId'],
-        get_at = fetchAnalytic['get_at'],
-        YouTubeView = int(fetchAnalytic['analytic']['view']['YouTube']),
-        YouTubeLike = int(fetchAnalytic['analytic']['like']['YouTube']),
-        YouTubeComment = int(fetchAnalytic['analytic']['comment']['YouTube']),
-        niconicoView = int(fetchAnalytic['analytic']['view']['niconico']),
-        niconicoLike = int(fetchAnalytic['analytic']['like']['niconico']),
-        niconicoComment = int(fetchAnalytic['analytic']['comment']['niconico']),
-        niconicoMylist = int(fetchAnalytic['analytic']['mylist']['niconico'])
-      )
+    for fetchAnalytic in fetchAnalytics.items():
+      fetchAnalyticJson = fetchAnalytic[1]
+      videoId, get_at = fetchAnalyticJson['videoId'], fetchAnalyticJson['get_at']
+      YouTubeView, YouTubeLike, YouTubeComment = int(fetchAnalyticJson['analytic']['view']['YouTube']), int(fetchAnalyticJson['analytic']['like']['YouTube']), int(fetchAnalyticJson['analytic']['comment']['YouTube'])
+      niconicoView, niconicoLike, niconicoComment, niconicoMylist = int(fetchAnalyticJson['analytic']['view']['niconico']), int(fetchAnalyticJson['analytic']['like']['niconico']), int(fetchAnalyticJson['analytic']['comment']['niconico']), int(fetchAnalyticJson['analytic']['mylist']['niconico'])
+      try:
+        analytic = Analytic.objects.get(videoId=videoId, get_at=get_at)
+        analytic.YouTubeView = YouTubeView
+        analytic.YouTubeLike = YouTubeLike
+        analytic.YouTubeComment = YouTubeComment
+        analytic.niconicoView = niconicoView
+        analytic.niconicoLike = niconicoLike
+        analytic.niconicoComment = niconicoComment
+        analytic.niconicoMylist = niconicoMylist
+      except Analytic.DoesNotExist:
+        analytic = Analytic(
+          videoId = videoId,
+          get_at = get_at,
+          YouTubeView = YouTubeView,
+          YouTubeLike = YouTubeLike,
+          YouTubeComment = YouTubeComment,
+          niconicoView = niconicoView,
+          niconicoLike = niconicoLike,
+          niconicoComment = niconicoComment,
+          niconicoMylist = niconicoMylist
+        )
       analytic.save()
-    return redirect(index)
+    return redirect('top')
   return render(request, 'analytics/fetch.html')
