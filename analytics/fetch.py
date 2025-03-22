@@ -31,7 +31,7 @@ def fetchNicoNicoAPI(videoId: str|None):
     data = response_json["data"][0]
   return data
 def fetchSupabaseAPI(supabaseClient: Client):
-  response = supabaseClient.table('video').select('id, YouTube, niconico').eq('public', True).execute()
+  response = supabaseClient.table('video').select('id, title, posted_at, YouTube, niconico').eq('public', True).execute()
   data = response.data
   return data
 
@@ -41,34 +41,36 @@ def FetchAnalytics():
   analytics = {}
   id = 0
   for video in videoList:
-    YouTubeData = fetchYouTubeAPI(video['YouTube'])
-    niconicoData = fetchNicoNicoAPI(video['niconico'])
-    videoId = video['id']
-    YouTubeView, niconicoView = YouTubeData['viewCount'], niconicoData['viewCounter']
-    YouTubeLike, niconicoLike = YouTubeData['likeCount'], niconicoData['likeCounter']
-    YouTubeComment, niconicoComment = YouTubeData['commentCount'], niconicoData['commentCounter']
-    niconicoMylist = niconicoData['mylistCounter']
-    analytic = {
+    meta = {
+      "id": video['id'],
+      "title": video['title'],
+      "posted_at": video['posted_at'],
+      "YouTube": video['YouTube'],
+      "niconico": video['niconico']
+    }
+    YouTubeData = fetchYouTubeAPI(meta['YouTube'])
+    niconicoData = fetchNicoNicoAPI(meta['niconico'])
+    stats = {
       "view": {
-        "YouTube": YouTubeView,
-        "niconico": niconicoView
+        "YouTube": int(YouTubeData['viewCount']),
+        "niconico": int(niconicoData['viewCounter'])
       },
       "like": {
-        "YouTube": YouTubeLike,
-        "niconico": niconicoLike
+        "YouTube": int(YouTubeData['likeCount']),
+        "niconico": int(niconicoData['likeCounter'])
       },
       "comment": {
-        "YouTube": YouTubeComment,
-        "niconico": niconicoComment
+        "YouTube": int(YouTubeData['commentCount']),
+        "niconico": int(niconicoData['commentCounter'])
       },
       "mylist": {
-        "niconico": niconicoMylist
+        "niconico": int(niconicoData['mylistCounter'])
       }
     }
     analytics[id] = {
-      "videoId": videoId,
       "get_at": datetime.date.today(),
-      "analytic": analytic
+      "meta": meta,
+      "stats": stats
     }
     id += 1
   return analytics

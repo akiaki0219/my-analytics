@@ -1,29 +1,73 @@
+import re
 from analytics.fetch import FetchAnalytics
-from analytics.models import Analytic
+from analytics.models import Analytic, Video, compareAnalytic
 from datetime import date
 from django.http import Http404
 from django.shortcuts import redirect, render
 
 def index(request):
+  analytics = Analytic.objects.filter(get_at=date.today()).order_by('video__video_number')
+  list_get_at = []
+  if len(analytics) != 0:
+    for analytic in Analytic.objects.filter(video=Video.objects.get(video_number=analytics[0].video.video_number)):
+      list_get_at.append(analytic.get_at)
+    list_get_at.reverse()
   sort_options = {
-    'id': 'videoId',
+    'id': 'video__video_number',
     'view': 'YouTubeView',
     'like': 'YouTubeLike',
     'comment': 'YouTubeComment'
   }
-  sort_field = sort_options.get(request.GET.get('sort'), 'videoId')
+  sort_field = sort_options.get(request.GET.get('sort'), 'video__video_number')
   order = '' if request.GET.get('order')=='asc' else '-'
   analytics = Analytic.objects.filter(get_at=date.today()).order_by('{}{}'.format(order, sort_field))
+  compare_date_str = request.GET.get('compare')
+  if len(list_get_at) == 0:
+    compare_date_date = date.today()
+  elif len(list_get_at) == 1:
+    compare_date_date = list_get_at[0]
+  else:
+    compare_date_date = list_get_at[1]
+  if compare_date_str is not None:
+    compare_date = tuple(map(int, re.match(r'([0-9]+)年([0-9]+)月([0-9]+)日', compare_date_str).groups()))
+    print(compare_date)
+    compare_date_date = date(compare_date[0], compare_date[1], compare_date[2])
+    print(compare_date_date)
+  context_analytics = []
+  for analytic in analytics:
+    try:
+      comparedAnalytic = Analytic.objects.get(video=analytic.video, get_at=compare_date_date)
+    except Analytic.DoesNotExist:
+      comparedAnalytic = Analytic(
+        video=analytic.video
+      )
+    context_analytics.append({
+      'analytic': analytic,
+      'totalView': analytic.totalStatistic()['view'],
+      'totalLike': analytic.totalStatistic()['like'],
+      'totalComment': analytic.totalStatistic()['comment'],
+      'comparedStats': compareAnalytic(analytic, comparedAnalytic)
+    })
   context = {
-    'analytics': analytics
+    'list_get_at': list_get_at,
+    'analytics': context_analytics,
   }
   return render(request, "analytics/index.html", context)
 
-def detail(request, analytic_id):
-  try: analytic = Analytic.objects.get(pk=analytic_id)
-  except Analytic.DoesNotExist: raise Http404("Task doen not exist")
+def detail(request, video_number):
+  try: 
+    video = Video.objects.get(video_number=video_number)
+  except Video.DoesNotExist:
+    raise Http404("Video does not exist")
+  analytics = Analytic.objects.filter(video=video).order_by('-get_at')
   context = {
-    'analytic': analytic
+    'video': video,
+    'analytics': [{
+      'analytic': analytic,
+      'totalView': analytic.totalStatistic()['view'],
+      'totalLike': analytic.totalStatistic()['like'],
+      'totalComment': analytic.totalStatistic()['comment'],
+    } for analytic in analytics]
   }
   return render(request, 'analytics/detail.html', context)
 
@@ -32,30 +76,35 @@ def fetch(request):
     fetchAnalytics = FetchAnalytics()
     for fetchAnalytic in fetchAnalytics.items():
       fetchAnalyticJson = fetchAnalytic[1]
-      videoId, get_at = fetchAnalyticJson['videoId'], fetchAnalyticJson['get_at']
-      YouTubeView, YouTubeLike, YouTubeComment = int(fetchAnalyticJson['analytic']['view']['YouTube']), int(fetchAnalyticJson['analytic']['like']['YouTube']), int(fetchAnalyticJson['analytic']['comment']['YouTube'])
-      niconicoView, niconicoLike, niconicoComment, niconicoMylist = int(fetchAnalyticJson['analytic']['view']['niconico']), int(fetchAnalyticJson['analytic']['like']['niconico']), int(fetchAnalyticJson['analytic']['comment']['niconico']), int(fetchAnalyticJson['analytic']['mylist']['niconico'])
-      try:
-        analytic = Analytic.objects.get(videoId=videoId, get_at=get_at)
-        analytic.YouTubeView = YouTubeView
-        analytic.YouTubeLike = YouTubeLike
-        analytic.YouTubeComment = YouTubeComment
-        analytic.niconicoView = niconicoView
-        analytic.niconicoLike = niconicoLike
-        analytic.niconicoComment = niconicoComment
-        analytic.niconicoMylist = niconicoMylist
-      except Analytic.DoesNotExist:
-        analytic = Analytic(
-          videoId = videoId,
-          get_at = get_at,
-          YouTubeView = YouTubeView,
-          YouTubeLike = YouTubeLike,
-          YouTubeComment = YouTubeComment,
-          niconicoView = niconicoView,
-          niconicoLike = niconicoLike,
-          niconicoComment = niconicoComment,
-          niconicoMylist = niconicoMylist
-        )
-      analytic.save()
+      video_id, get_at = fetchAnalyticJson['meta']['id'], fetchAnalyticJson['get_at']
+      video, created = Video.objects.get_or_create(
+        video_number=video_id,
+        title=fetchAnalyticJson['meta']['title'],
+        posted_at=fetchAnalyticJson['meta']['posted_at'],
+        YouTube=fetchAnalyticJson['meta']['YouTube'],
+        niconico=fetchAnalyticJson['meta']['niconico']
+      )
+      analytic, created = Analytic.objects.update_or_create(
+        video=video,
+        get_at=get_at,
+        defaults={
+          "YouTubeView": fetchAnalyticJson['stats']['view']['YouTube'],
+          "YouTubeLike": fetchAnalyticJson['stats']['like']['YouTube'],
+          "YouTubeComment": fetchAnalyticJson['stats']['comment']['YouTube'],
+          "niconicoView": fetchAnalyticJson['stats']['view']['niconico'],
+          "niconicoLike": fetchAnalyticJson['stats']['like']['niconico'],
+          "niconicoComment": fetchAnalyticJson['stats']['comment']['niconico'],
+          "niconicoMylist": fetchAnalyticJson['stats']['mylist']['niconico']
+        },
+        create_defaults={
+          "YouTubeView": fetchAnalyticJson['stats']['view']['YouTube'],
+          "YouTubeLike": fetchAnalyticJson['stats']['like']['YouTube'],
+          "YouTubeComment": fetchAnalyticJson['stats']['comment']['YouTube'],
+          "niconicoView": fetchAnalyticJson['stats']['view']['niconico'],
+          "niconicoLike": fetchAnalyticJson['stats']['like']['niconico'],
+          "niconicoComment": fetchAnalyticJson['stats']['comment']['niconico'],
+          "niconicoMylist": fetchAnalyticJson['stats']['mylist']['niconico']
+        }
+      )
     return redirect('top')
   return render(request, 'analytics/fetch.html')
