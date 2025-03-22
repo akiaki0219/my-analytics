@@ -15,56 +15,74 @@
     </form>
     <br>
     <form action="{% url 'top' %}" method="get">
-      <h2>Sort Option</h2>
       <div>
-        <input type="radio" id="videoId" name="sort" value="id"/>
-        <label for="videoId">Video Id</label>
+        <label for="sort-select">Sort Option (Based on YouTube data)</label>
+        <select name="sort" id="sort-select">
+          <option value="id">Post Date</option>
+          <option value="view">View Count</option>
+          <option value="like">Like Count</option>
+          <option value="comment">Comment Count</option>
+        </select>
       </div>
-      <div>
-        <input type="radio" id="viewCount" name="sort" value="view" />
-        <label for="viewCount">View Count</label>
+        <div>
+        <label for="order-select">Sort Order</label>
+        <select name="order" id="order-select">
+          <option value="asc">Ascending</option>
+          <option value="desc" selected>Descending</option>
+        </select>
       </div>
-      <div>
-        <input type="radio" id="likeCount" name="sort" value="like" />
-        <label for="likeCount">Like Count</label>
-      </div>
-      <div>
-        <input type="radio" id="commentCount" name="sort" value="comment" />
-        <label for="commentCount">Comment Count</label>
-      </div>
-      <h2>Sort Order</h2>
-      <div>
-        <input type="radio" id="asc" name="order" value="asc" />
-        <label for="asc">Ascending</label>
-      </div>
-      <div>
-        <input type="radio" id="desc" name="order" value="desc"/>
-        <label for="desc">Descending</label>
+        <div>
+        <label for="compare-select">Compare Date</label>
+        <select name="compare" id="compare-select">
+          {% for date in list_get_at %}
+            <option value="{{ date }}">{{ date }}</option>
+          {% endfor %}
+        </select>
       </div>
       <div>
         <button type="submit">Apply</button>
       </div>
     </form>
-    {% for analytic in analytics %}
-    <div class="text">
-      <h2><a href="{% url 'detail' analytic.id %}">{{ analytic.videoId }}</a></h2>
-      <ul>
-        <li>Get at: {{ analytic.get_at }}</li>
-        <li>View<ul>
-          <li>YouTube: {{ analytic.YouTubeView }}</li>
-          <li>niconico: {{ analytic.niconicoView }}</li>
-        </ul></li>
-        <li>Like<ul>
-          <li>YouTube: {{ analytic.YouTubeLike }}</li>
-          <li>niconico: {{ analytic.niconicoLike }}</li>
-        </ul></li>
-        <li>Comment<ul>
-          <li>YouTube: {{ analytic.YouTubeComment }}</li>
-          <li>niconico: {{ analytic.niconicoComment }}</li>
-        </ul></li>
-        <li>MyList: {{ analytic.niconicoMylist }}</li>
-      </ul>
-    </div>
-    {% endfor %}
+    <table>
+      <thead>
+        <tr>
+          <th scope="col" rowspan="2">Video Title</th>
+          <th scope="col" rowspan="2">Get At</th>
+          <th scope="col" colspan="2">View</th>
+          <th scope="col" colspan="2">Like</th>
+          <th scope="col" colspan="2">Comment</th>
+          <th scope="col" colspan="1">MyList</th>
+        </tr>
+        <tr>
+          <th scope="col">YouTube</th>
+          <th scope="col">niconico</th>
+          <th scope="col">YouTube</th>
+          <th scope="col">niconico</th>
+          <th scope="col">YouTube</th>
+          <th scope="col">niconico</th>
+          <th scope="col">niconico</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for analytic in analytics %}
+          <tr>
+            <th scope="col" rowspan="2"><a href="{% url 'detail' analytic.analytic.video.video_number %}">{{ analytic.analytic.video.title }}</a></th>
+            <th scope="col" rowspan="2">{{ analytic.analytic.get_at }}</th>
+            <th scope="col" colspan="2">{{ analytic.totalView }}({{ analytic.comparedStats.view.total }})</th>
+            <th scope="col" colspan="2">{{ analytic.totalLike }}({{ analytic.comparedStats.like.total }})</th>
+            <th scope="col" colspan="2">{{ analytic.totalComment }}({{ analytic.comparedStats.comment.total }})</th>
+          </tr>
+          <tr>
+            <th scope="col">{{ analytic.analytic.YouTubeView }}({{ analytic.comparedStats.view.YouTube }})</th>
+            <th scope="col">{{ analytic.analytic.niconicoView }}({{ analytic.comparedStats.view.niconico }})</th>
+            <th scope="col">{{ analytic.analytic.YouTubeLike }}({{ analytic.comparedStats.like.YouTube }})</th>
+            <th scope="col">{{ analytic.analytic.niconicoLike }}({{ analytic.comparedStats.like.niconico }})</th>
+            <th scope="col">{{ analytic.analytic.YouTubeComment }}({{ analytic.comparedStats.comment.YouTube }})</th>
+            <th scope="col">{{ analytic.analytic.niconicoComment }}({{ analytic.comparedStats.comment.niconico }})</th>
+            <th scope="col">{{ analytic.analytic.niconicoMylist }}({{ analytic.comparedStats.mylist.niconico }})</th>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </body>
 </html>

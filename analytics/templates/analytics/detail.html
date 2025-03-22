@@ -7,25 +7,50 @@
     <meta name="author" content="Akkiy">
   </head>
   <body>
-    <div class="text">
-      <h1>{{ analytic.videoTitle }}</h1>
-      <ul>
-        <li>Get at: {{ analytic.get_at }}</li>
-        <li>View<ul>
-          <li>YouTube: {{ analytic.YouTubeView }}</li>
-          <li>niconico: {{ analytic.niconicoView }}</li>
-        </ul></li>
-        <li>Like<ul>
-          <li>YouTube: {{ analytic.YouTubeLike }}</li>
-          <li>niconico: {{ analytic.niconicoLike }}</li>
-        </ul></li>
-        <li>Comment<ul>
-          <li>YouTube: {{ analytic.YouTubeComment }}</li>
-          <li>niconico: {{ analytic.niconicoComment }}</li>
-        </ul></li>
-        <li>MyList: {{ analytic.niconicoMylist }}</li>
-      </ul>
-    </div>
+    <h2>{{ video.title }}</h2>
+    <p>posted_at: {{ video.posted_at }}</p>
+    <a href="https://youtu.be/{{ video.YouTube }}">YouTube</a>
+    <a href="https://nico.ms/{{ video.niconico }}">niconico</a>
+    <a href="https://akkiy-site.vercel.app/video/{{ video.video_number }}">Individual page</a>
+    <table>
+      <thead>
+        <tr>
+          <th scope="col" rowspan="2">Get At</th>
+          <th scope="col" colspan="2">View</th>
+          <th scope="col" colspan="2">Like</th>
+          <th scope="col" colspan="2">Comment</th>
+          <th scope="col" colspan="1">MyList</th>
+        </tr>
+        <tr>
+          <th scope="col">YouTube</th>
+          <th scope="col">niconico</th>
+          <th scope="col">YouTube</th>
+          <th scope="col">niconico</th>
+          <th scope="col">YouTube</th>
+          <th scope="col">niconico</th>
+          <th scope="col">niconico</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for analytic in analytics %}
+          <tr>
+            <th scope="col" rowspan="2">{{ analytic.analytic.get_at }}</th>
+            <th scope="col" colspan="2">{{ analytic.totalView }}</th>
+            <th scope="col" colspan="2">{{ analytic.totalLike }}</th>
+            <th scope="col" colspan="2">{{ analytic.total.Comment }}</th>
+          </tr>
+          <tr>
+            <th scope="col">{{ analytic.analytic.YouTubeView }}</th>
+            <th scope="col">{{ analytic.analytic.niconicoView }}</th>
+            <th scope="col">{{ analytic.analytic.YouTubeLike }}</th>
+            <th scope="col">{{ analytic.analytic.niconicoLike }}</th>
+            <th scope="col">{{ analytic.analytic.YouTubeComment }}</th>
+            <th scope="col">{{ analytic.analytic.niconicoComment }}</th>
+            <th scope="col">{{ analytic.analytic.niconicoMylist }}</th>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
     <div>
       <a href="{% url 'top' %}">Top</a>
     </div>
