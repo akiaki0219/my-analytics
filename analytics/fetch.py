@@ -35,12 +35,12 @@ def fetchNicoNicoAPI(videoId: str | None):
             "commentCounter": 0
         }
     else:
-        response = requests.get(
-            'https://snapshot.search.nicovideo.jp/'\
-            'api/v2/snapshot/video/contents/search?'\
-            'q=&fields=viewCounter,mylistCounter,likeCounter,commentCounter&'\
+        response = requests.get((
+            'https://snapshot.search.nicovideo.jp/'
+            'api/v2/snapshot/video/contents/search?'
+            'q=&fields=viewCounter,mylistCounter,likeCounter,commentCounter&'
             'filters[contentId][0]={}&_sort=-viewCounter&_context=analytics'
-            .format(videoId))
+            ).format(videoId))
         response_json = json.loads(response.content.decode())
         data = response_json["data"][0]
     return data
