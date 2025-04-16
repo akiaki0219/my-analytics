@@ -29,7 +29,8 @@ def index(request):
         query_strings['non_zero_option'] = 'total'
     sort, sort_option = query_strings['sort'], query_strings['sort_option']
     order, compare_date_str = query_strings['order'], query_strings['compare']
-    non_zero, non_zero_target, non_zero_option = query_strings['non_zero'], query_strings['non_zero_target'], query_strings['non_zero_option']
+    non_zero, non_zero_target = query_strings['non_zero'], query_strings['non_zero_target']
+    non_zero_option = query_strings['non_zero_option']
     analytic_first = Analytic.objects.filter(get_at=date.today()).order_by('video__video_number').first()
     list_get_at = []
     if analytic_first:
@@ -49,31 +50,34 @@ def index(request):
         query_strings['compare'] = compare_date_date
     sort_options = {
         'total': {
-        'view': 'totalView',
-        'like': 'totalLike',
-        'comment': 'totalComment',
-        'mylist': 'totalMylist'
+            'view': 'totalView',
+            'like': 'totalLike',
+            'comment': 'totalComment',
+            'mylist': 'totalMylist'
         },
         'youtube': {
-        'view': 'YouTubeView',
-        'like': 'YouTubeLike',
-        'comment': 'YouTubeComment',
-        'mylist': 'niconicoMylist'
+            'view': 'YouTubeView',
+            'like': 'YouTubeLike',
+            'comment': 'YouTubeComment',
+            'mylist': 'niconicoMylist'
         },
         'niconico': {
-        'view': 'niconicoView',
-        'like': 'niconicoLike',
-        'comment': 'niconicoComment',
-        'mylist': 'niconicoMylist'
+            'view': 'niconicoView',
+            'like': 'niconicoLike',
+            'comment': 'niconicoComment',
+            'mylist': 'niconicoMylist'
         }
     }
     if sort_option != 'total' and sort is not None:
         if sort == "id":
-            analytics = Analytic.objects.filter(get_at=date.today()).order_by("{}video__video_number".format("" if order == "asc" else "-"))
+            analytics = Analytic.objects.filter(get_at=date.today())\
+                .order_by("{}video__video_number".format("" if order == "asc" else "-"))
         else:
-            analytics = Analytic.objects.filter(get_at=date.today()).order_by("{}{}".format("" if order=="asc" else "-", sort_options[sort_option][sort]))
+            analytics = Analytic.objects.filter(get_at=date.today())\
+                .order_by("{}{}".format("" if order == "asc" else "-", sort_options[sort_option][sort]))
     else:
-        analytics = Analytic.objects.filter(get_at=date.today()).order_by("{}video__video_number".format("" if order=="asc" else "-"))
+        analytics = Analytic.objects.filter(get_at=date.today())\
+            .order_by("{}video__video_number".format("" if order == "asc" else "-"))
     context_analytics = []
     for analytic in analytics:
         try:
@@ -83,15 +87,16 @@ def index(request):
                 video=analytic.video
             )
             context_analytics.append({
-            'analytic': analytic,
-            'totalView': analytic.totalStatistic()['view'],
-            'totalLike': analytic.totalStatistic()['like'],
-            'totalComment': analytic.totalStatistic()['comment'],
-            'totalMylist': analytic.niconicoMylist,
-            'comparedStats': compareAnalytic(analytic, comparedAnalytic)
+                'analytic': analytic,
+                'totalView': analytic.totalStatistic()['view'],
+                'totalLike': analytic.totalStatistic()['like'],
+                'totalComment': analytic.totalStatistic()['comment'],
+                'totalMylist': analytic.niconicoMylist,
+                'comparedStats': compareAnalytic(analytic, comparedAnalytic)
             })
     if sort is not None and sort != 'id' and sort_option == 'total':
-        analytics = sorted(context_analytics, key=lambda analytic: analytic[sort_options['total'][sort]], reverse=(order == 'desc'))
+        analytics = sorted(context_analytics,
+                           key=lambda analytic: analytic[sort_options['total'][sort]], reverse=(order == 'desc'))
     else:
         analytics = context_analytics
     if non_zero == 'on':
@@ -100,12 +105,26 @@ def index(request):
             for analytic in analytics:
                 compared_stats = analytic['comparedStats']
                 if non_zero_option == 'youtube':
-                    target_compared_stats = [compared_stats['view']['YouTube'], compared_stats['like']['YouTube'], compared_stats['comment']['YouTube']]
+                    target_compared_stats = [
+                        compared_stats['view']['YouTube'],
+                        compared_stats['like']['YouTube'],
+                        compared_stats['comment']['YouTube']
+                    ]
                 elif non_zero_option == 'niconico':
-                    target_compared_stats = [compared_stats['view']['niconico'], compared_stats['like']['niconico'], compared_stats['comment']['niconico']], compared_stats['mylist']['niconico']
+                    target_compared_stats = [
+                        compared_stats['view']['niconico'],
+                        compared_stats['like']['niconico'],
+                        compared_stats['comment']['niconico'],
+                        compared_stats['mylist']['niconico']
+                    ]
                 else:
-                    target_compared_stats = [compared_stats['view']['total'], compared_stats['like']['total'], compared_stats['comment']['total']], compared_stats['mylist']['niconico']
-                if any([i != 0 for i in target_compared_stats]) == True:
+                    target_compared_stats = [
+                        compared_stats['view']['total'],
+                        compared_stats['like']['total'],
+                        compared_stats['comment']['total'],
+                        compared_stats['mylist']['niconico']
+                    ]
+                if any([i != 0 for i in target_compared_stats]):
                     context_analytics.append(analytic)
         else:
             for analytic in analytics:
@@ -129,7 +148,7 @@ def index(request):
 
 
 def detail(request, video_number):
-    try: 
+    try:
         video = Video.objects.get(video_number=video_number)
     except Video.DoesNotExist:
         raise Http404("Video does not exist")
@@ -137,10 +156,10 @@ def detail(request, video_number):
     context = {
         'video': video,
         'analytics': [{
-        'analytic': analytic,
-        'totalView': analytic.totalStatistic()['view'],
-        'totalLike': analytic.totalStatistic()['like'],
-        'totalComment': analytic.totalStatistic()['comment'],
+            'analytic': analytic,
+            'totalView': analytic.totalStatistic()['view'],
+            'totalLike': analytic.totalStatistic()['like'],
+            'totalComment': analytic.totalStatistic()['comment'],
         } for analytic in analytics]
     }
     return render(request, 'analytics/detail.html', context)
@@ -163,22 +182,22 @@ def fetch(request):
                 video=video,
                 get_at=get_at,
                 defaults={
-                "YouTubeView": fetchAnalyticJson['stats']['view']['YouTube'],
-                "YouTubeLike": fetchAnalyticJson['stats']['like']['YouTube'],
-                "YouTubeComment": fetchAnalyticJson['stats']['comment']['YouTube'],
-                "niconicoView": fetchAnalyticJson['stats']['view']['niconico'],
-                "niconicoLike": fetchAnalyticJson['stats']['like']['niconico'],
-                "niconicoComment": fetchAnalyticJson['stats']['comment']['niconico'],
-                "niconicoMylist": fetchAnalyticJson['stats']['mylist']['niconico']
+                    "YouTubeView": fetchAnalyticJson['stats']['view']['YouTube'],
+                    "YouTubeLike": fetchAnalyticJson['stats']['like']['YouTube'],
+                    "YouTubeComment": fetchAnalyticJson['stats']['comment']['YouTube'],
+                    "niconicoView": fetchAnalyticJson['stats']['view']['niconico'],
+                    "niconicoLike": fetchAnalyticJson['stats']['like']['niconico'],
+                    "niconicoComment": fetchAnalyticJson['stats']['comment']['niconico'],
+                    "niconicoMylist": fetchAnalyticJson['stats']['mylist']['niconico']
                 },
                 create_defaults={
-                "YouTubeView": fetchAnalyticJson['stats']['view']['YouTube'],
-                "YouTubeLike": fetchAnalyticJson['stats']['like']['YouTube'],
-                "YouTubeComment": fetchAnalyticJson['stats']['comment']['YouTube'],
-                "niconicoView": fetchAnalyticJson['stats']['view']['niconico'],
-                "niconicoLike": fetchAnalyticJson['stats']['like']['niconico'],
-                "niconicoComment": fetchAnalyticJson['stats']['comment']['niconico'],
-                "niconicoMylist": fetchAnalyticJson['stats']['mylist']['niconico']
+                    "YouTubeView": fetchAnalyticJson['stats']['view']['YouTube'],
+                    "YouTubeLike": fetchAnalyticJson['stats']['like']['YouTube'],
+                    "YouTubeComment": fetchAnalyticJson['stats']['comment']['YouTube'],
+                    "niconicoView": fetchAnalyticJson['stats']['view']['niconico'],
+                    "niconicoLike": fetchAnalyticJson['stats']['like']['niconico'],
+                    "niconicoComment": fetchAnalyticJson['stats']['comment']['niconico'],
+                    "niconicoMylist": fetchAnalyticJson['stats']['mylist']['niconico']
                 }
             )
         return redirect('top')
