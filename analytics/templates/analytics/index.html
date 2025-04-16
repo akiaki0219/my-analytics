@@ -7,82 +7,192 @@
     <meta name="author" content="Akkiy">
   </head>
   <body>
-    <h1>My Analytics</h1>
+    <a href="{% url 'top' %}"><h1>My Analytics</h1></a>
     <form action="{% url 'fetch' %}" method="get">
       <div>
         <button type="submit">Fetch Latest Analytics</button>
       </div>
     </form>
     <br>
-    <form action="{% url 'top' %}" method="get">
-      <div>
-        <label for="sort-select">Sort Option (Based on YouTube data)</label>
-        <select name="sort" id="sort-select">
-          <option value="id">Post Date</option>
-          <option value="view">View Count</option>
-          <option value="like">Like Count</option>
-          <option value="comment">Comment Count</option>
-        </select>
-      </div>
+    {% if status == "Not fetched" %}
+      <p>Today's analytics data is not fetched</p>
+    {% else %}
+      <form action="{% url 'top' %}" method="get">
         <div>
-        <label for="order-select">Sort Order</label>
-        <select name="order" id="order-select">
-          <option value="asc">Ascending</option>
-          <option value="desc" selected>Descending</option>
-        </select>
-      </div>
+          <label for="sort-select">Sort Option</label>
+          <select name="sort" id="sort-select">
+            {% if query_strings.sort == "id" %}
+              <option value="id" selected>Post Date</option>
+            {% else %}
+              <option value="id">Post Date</option>
+            {% endif %}
+            {% if query_strings.sort == "view" %}
+              <option value="view" selected>View Count</option>
+            {% else %}
+              <option value="view">View Count</option>
+            {% endif %}
+            {% if query_strings.sort == "like" %}
+              <option value="like" selected>Like Count</option>
+            {% else %}
+              <option value="like">Like Count</option>
+            {% endif %}
+            {% if query_strings.sort == "comment" %}
+              <option value="comment" selected>Comment Count</option>
+            {% else %}
+              <option value="comment">Comment Count</option>
+            {% endif %}
+            {% if query_strings.sort == "mylist" %}
+              <option value="mylist" selected>MyList Count</option>
+            {% else %}
+              <option value="mylist">MyList Count</option>
+            {% endif %}
+          </select>
+          <select name="sort-option" id="sort-option-select">
+            {% if query_strings.sort_option == "total" %}
+              <option value="total" selected>Total Data</option>
+            {% else %}
+              <option value="total">Total Data</option>
+            {% endif %}
+            {% if query_strings.sort_option == "youtube" %}
+              <option value="youtube" selected>YouTube Data</option>
+            {% else %}
+              <option value="youtube">YouTube Data</option>
+            {% endif %}
+            {% if query_strings.sort_option == "niconico" %}
+              <option value="niconico" selected>niconico Data</option>
+            {% else %}
+              <option value="niconico">niconico Data</option>
+            {% endif %}
+          </select>
+        </div>
         <div>
-        <label for="compare-select">Compare Date</label>
-        <select name="compare" id="compare-select">
-          {% for date in list_get_at %}
-            <option value="{{ date }}">{{ date }}</option>
-          {% endfor %}
-        </select>
-      </div>
-      <div>
-        <button type="submit">Apply</button>
-      </div>
-    </form>
-    <table>
-      <thead>
-        <tr>
-          <th scope="col" rowspan="2">Video Title</th>
-          <th scope="col" rowspan="2">Get At</th>
-          <th scope="col" colspan="2">View</th>
-          <th scope="col" colspan="2">Like</th>
-          <th scope="col" colspan="2">Comment</th>
-          <th scope="col" colspan="1">MyList</th>
-        </tr>
-        <tr>
-          <th scope="col">YouTube</th>
-          <th scope="col">niconico</th>
-          <th scope="col">YouTube</th>
-          <th scope="col">niconico</th>
-          <th scope="col">YouTube</th>
-          <th scope="col">niconico</th>
-          <th scope="col">niconico</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for analytic in analytics %}
-          <tr>
-            <th scope="col" rowspan="2"><a href="{% url 'detail' analytic.analytic.video.video_number %}">{{ analytic.analytic.video.title }}</a></th>
-            <th scope="col" rowspan="2">{{ analytic.analytic.get_at }}</th>
-            <th scope="col" colspan="2">{{ analytic.totalView }}({{ analytic.comparedStats.view.total }})</th>
-            <th scope="col" colspan="2">{{ analytic.totalLike }}({{ analytic.comparedStats.like.total }})</th>
-            <th scope="col" colspan="2">{{ analytic.totalComment }}({{ analytic.comparedStats.comment.total }})</th>
-          </tr>
-          <tr>
-            <th scope="col">{{ analytic.analytic.YouTubeView }}({{ analytic.comparedStats.view.YouTube }})</th>
-            <th scope="col">{{ analytic.analytic.niconicoView }}({{ analytic.comparedStats.view.niconico }})</th>
-            <th scope="col">{{ analytic.analytic.YouTubeLike }}({{ analytic.comparedStats.like.YouTube }})</th>
-            <th scope="col">{{ analytic.analytic.niconicoLike }}({{ analytic.comparedStats.like.niconico }})</th>
-            <th scope="col">{{ analytic.analytic.YouTubeComment }}({{ analytic.comparedStats.comment.YouTube }})</th>
-            <th scope="col">{{ analytic.analytic.niconicoComment }}({{ analytic.comparedStats.comment.niconico }})</th>
-            <th scope="col">{{ analytic.analytic.niconicoMylist }}({{ analytic.comparedStats.mylist.niconico }})</th>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+          <label for="order-select">Sort Order</label>
+          <select name="order" id="order-select">
+            {% if query_strings.order == "asc" %}
+              <option value="asc" selected>Ascending</option>
+            {% else %}
+              <option value="asc">Ascending</option>
+            {% endif %}
+            {% if query_strings.order == "desc" %}
+              <option value="desc" selected>Descending</option>
+            {% else %}
+              <option value="desc">Descending</option>
+            {% endif %}
+          </select>
+        </div>
+        <div>
+          <label for="compare-select">Compare Date</label>
+          <select name="compare" id="compare-select">
+            {% for date in list_get_at %}
+              {% if date == query_strings.compare %}
+                <option value="{{ date }}" selected>{{ date }}</option>
+              {% else %}
+                <option value="{{ date }}">{{ date }}</option>
+              {% endif %}
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          {% if query_strings.non_zero == "on" %}
+            <input type="checkbox" id="non-zero" name="non-zero" checked>
+          {% else %}
+            <input type="checkbox" id="non-zero" name="non-zero">
+          {% endif %}
+          <label for="non-zero">Non zero</label>
+          <select name="non-zero-target" id="non-zero-target-select">
+            {% if query_strings.non_zero_target == "all" %}
+              <option value="all" selected>All Count</option>
+            {% else %}
+              <option value="all">All Count</option>
+            {% endif %}
+            {% if query_strings.non_zero_target == "view" %}
+              <option value="view" selected>View Count</option>
+            {% else %}
+              <option value="view">View Count</option>
+            {% endif %}
+            {% if query_strings.non_zero_target == "like" %}
+              <option value="like" selected>Like Count</option>
+            {% else %}
+              <option value="like">Like Count</option>
+            {% endif %}
+            {% if query_strings.non_zero_target == "comment" %}
+              <option value="comment" selected>Comment Count</option>
+            {% else %}
+              <option value="comment">Comment Count</option>
+            {% endif %}
+            {% if query_strings.non_zero_target == "mylist" %}
+              <option value="mylist" selected>MyList Count</option>
+            {% else %}
+              <option value="mylist">MyList Count</option>
+            {% endif %}
+          </select>
+          <select name="non-zero-option" id="non-zero-option-select">
+            {% if query_strings.non_zero_option == "total" %}
+              <option value="total" selected>Total Data</option>
+            {% else %}
+              <option value="total">total Data</option>
+            {% endif %}
+            {% if query_strings.non_zero_option == "youtube" %}
+              <option value="youtube" selected>YouTube Data</option>
+            {% else %}
+              <option value="youtube">YouTube Data</option>
+            {% endif %}
+            {% if query_strings.non_zero_option == "niconico" %}
+              <option value="niconico" selected>niconico Data</option>
+            {% else %}
+              <option value="niconico">niconico Data</option>
+            {% endif %}
+          </select>
+        </div>
+        <div>
+          <button type="submit">Apply</button>
+        </div>
+      </form>
+      {% if status == "No data" %}
+        <p>There are no data.  Please retry after changing search options.</p>
+      {% else %}
+        <table>
+          <thead>
+            <tr>
+              <th scope="col" rowspan="2">Video Title</th>
+              <th scope="col" rowspan="2">Get At</th>
+              <th scope="col" colspan="2">View</th>
+              <th scope="col" colspan="2">Like</th>
+              <th scope="col" colspan="2">Comment</th>
+              <th scope="col" colspan="1">MyList</th>
+            </tr>
+            <tr>
+              <th scope="col">YouTube</th>
+              <th scope="col">niconico</th>
+              <th scope="col">YouTube</th>
+              <th scope="col">niconico</th>
+              <th scope="col">YouTube</th>
+              <th scope="col">niconico</th>
+              <th scope="col">niconico</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for analytic in analytics %}
+              <tr>
+                <th scope="col" rowspan="2"><a href="{% url 'detail' analytic.analytic.video.video_number %}">{{ analytic.analytic.video.title }}</a></th>
+                <th scope="col" rowspan="2">{{ analytic.analytic.get_at }}</th>
+                <th scope="col" colspan="2">{{ analytic.totalView }}({{ analytic.comparedStats.view.total }})</th>
+                <th scope="col" colspan="2">{{ analytic.totalLike }}({{ analytic.comparedStats.like.total }})</th>
+                <th scope="col" colspan="2">{{ analytic.totalComment }}({{ analytic.comparedStats.comment.total }})</th>
+              </tr>
+              <tr>
+                <th scope="col">{{ analytic.analytic.YouTubeView }}({{ analytic.comparedStats.view.YouTube }})</th>
+                <th scope="col">{{ analytic.analytic.niconicoView }}({{ analytic.comparedStats.view.niconico }})</th>
+                <th scope="col">{{ analytic.analytic.YouTubeLike }}({{ analytic.comparedStats.like.YouTube }})</th>
+                <th scope="col">{{ analytic.analytic.niconicoLike }}({{ analytic.comparedStats.like.niconico }})</th>
+                <th scope="col">{{ analytic.analytic.YouTubeComment }}({{ analytic.comparedStats.comment.YouTube }})</th>
+                <th scope="col">{{ analytic.analytic.niconicoComment }}({{ analytic.comparedStats.comment.niconico }})</th>
+                <th scope="col">{{ analytic.analytic.niconicoMylist }}({{ analytic.comparedStats.mylist.niconico }})</th>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% endif %}
+    {% endif %}
   </body>
 </html>
