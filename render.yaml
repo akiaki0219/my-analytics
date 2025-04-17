@@ -3,7 +3,7 @@ services:
     name: my-analytics
     env: python
     plan: free
-    branch: production
+    branch: main
     buildCommand: "./build.sh"
     startCommand: "gunicorn config.wsgi:application"
     envVars:
