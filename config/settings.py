@@ -10,8 +10,14 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+import dotenv
 import os
 from pathlib import Path
+
+dotenv.load_dotenv()
+SUPABASE_USER = os.getenv("SUPABASE_ANALYTIC_USER")
+SUPABASE_PASSWORD = os.getenv("SUPABASE_PASSWORD")
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,7 +32,7 @@ SECRET_KEY = 'django-insecure-x7*k84*%tw)1r8alaq-cvwv(4%(4_o3_1&b1fpk9!pu=)z&q0z
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', '.vercel.app']
+ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -77,8 +83,12 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'postgres',
+        'USER': SUPABASE_USER,
+        'PASSWORD': SUPABASE_PASSWORD,
+        'HOST': 'aws-0-ap-northeast-1.pooler.supabase.com',
+        'PORT': '5432',
     }
 }
 
@@ -118,7 +128,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

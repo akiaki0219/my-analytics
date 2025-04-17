@@ -38,7 +38,8 @@ def index(request):
         status = 'Have fetched'
         for analytic in Analytic.objects.filter(video=Video.objects.get(video_number=analytic_first.video.video_number)):
             list_get_at.append(analytic.get_at)
-        list_get_at.reverse()
+        print(list_get_at)
+        list_get_at.sort(reverse=True)
     if compare_date_str is not None:
         compare_date = tuple(map(int, re.match(r'([0-9]+)年([0-9]+)月([0-9]+)日', compare_date_str).groups()))
         compare_date_date = date(compare_date[0], compare_date[1], compare_date[2])
