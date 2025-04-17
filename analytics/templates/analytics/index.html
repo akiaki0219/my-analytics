@@ -73,7 +73,7 @@
             {% else %}
               <option value="asc">Ascending</option>
             {% endif %}
-            {% if query_strings.order == "desc" %}
+            {% if query_strings.order == "desc" or not query_strings.order %}
               <option value="desc" selected>Descending</option>
             {% else %}
               <option value="desc">Descending</option>
@@ -130,7 +130,7 @@
             {% if query_strings.non_zero_option == "total" %}
               <option value="total" selected>Total Data</option>
             {% else %}
-              <option value="total">total Data</option>
+              <option value="total">Total Data</option>
             {% endif %}
             {% if query_strings.non_zero_option == "youtube" %}
               <option value="youtube" selected>YouTube Data</option>
