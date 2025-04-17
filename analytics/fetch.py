@@ -8,8 +8,8 @@ from supabase import create_client, Client
 
 dotenv.load_dotenv()
 DEVELOPER_KEY = os.getenv("YOUTUBE_KEY")
-SUPABASE_URL = os.getenv("SUPABASE_URL")
-SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+SUPABASE_URL = os.getenv("SUPABASE_WEB_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_WEB_KEY")
 
 
 def fetchYouTubeAPI(videoId: str | None):
