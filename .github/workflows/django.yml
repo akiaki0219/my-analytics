@@ -23,9 +23,14 @@ jobs:
         pip install flake8
         pip install -r requirements.txt
     - name: Set Environment Variables
-      env: 
-        SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-        SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+      env:
+        SECRET_KEY: ${{ secrets.SECRET_KEY }}
+        SUPABASE_WEB_URL: ${{ secrets.SUPABASE_WEB_URL }}
+        SUPABASE_WEB_KEY: ${{ secrets.SUPABASE_WEB_KEY }}
+        SUPABASE_ANALYTIC_USER: ${{ secrets.SUPABASE_ANALYTIC_USER }}
+        SUPABASE_ANALYTIC_URL: ${{ secrets.SUPABASE_ANALYTIC_URL }}
+        SUPABASE_ANALYTIC_KEY: ${{ secrets.SUPABASE_ANALYTIC_KEY }}
+        SUPABASE_PASSWORD: ${{ secrets.SUPABASE_PASSWORD }}
         YOUTUBE_KEY: ${{ secrets.YOUTUBE_KEY }}
       run: echo "Environment variables have been set"
     - name: Lint with flake8
@@ -35,9 +40,14 @@ jobs:
         #exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Run Tests
-      env: 
-        SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-        SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+      env:
+        SECRET_KEY: ${{ secrets.SECRET_KEY }}
+        SUPABASE_WEB_URL: ${{ secrets.SUPABASE_WEB_URL }}
+        SUPABASE_WEB_KEY: ${{ secrets.SUPABASE_WEB_KEY }}
+        SUPABASE_ANALYTIC_USER: ${{ secrets.SUPABASE_ANALYTIC_USER }}
+        SUPABASE_ANALYTIC_URL: ${{ secrets.SUPABASE_ANALYTIC_URL }}
+        SUPABASE_ANALYTIC_KEY: ${{ secrets.SUPABASE_ANALYTIC_KEY }}
+        SUPABASE_PASSWORD: ${{ secrets.SUPABASE_PASSWORD }}
         YOUTUBE_KEY: ${{ secrets.YOUTUBE_KEY }}
       run: |
         python manage.py test
