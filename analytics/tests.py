@@ -22,8 +22,8 @@ class VideoModelTestCase(TestCase):
         self.assertEqual(video.posted_at, post)
         self.assertEqual(video.YouTube, "aaaaaaaaaaa")
         self.assertEqual(video.niconico, "sm9")
- 
- 
+
+
 class AnalyticModelTestCase(TestCase):
     def test_create_analytic0(self):
         post, get = date.today(), date.today()
