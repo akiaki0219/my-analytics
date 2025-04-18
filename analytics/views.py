@@ -4,6 +4,7 @@ from analytics.models import Analytic, Video, compareAnalytic
 from datetime import date
 from django.http import Http404
 from django.shortcuts import redirect, render
+from django.views.decorators.csrf import ensure_csrf_cookie
 
 
 def index(request):
@@ -169,39 +170,40 @@ def detail(request, video_number):
     return render(request, 'analytics/detail.html', context)
 
 
+@ensure_csrf_cookie
 def fetch(request):
     if request.method == "POST":
         fetch_analytics = FetchAnalytics()
-        for fetch_analytic in fetch_analytics.items():
-            fetch_analytic_json = fetch_analytic[1]
-            video_id, get_at = fetch_analytic_json['meta']['id'], fetch_analytic_json['get_at']
+        for i in fetch_analytics:
+            fetch_analytic = fetch_analytics[i]
+            video_id, get_at = fetch_analytic['meta']['id'], fetch_analytic['get_at']
             video, created = Video.objects.get_or_create(
                 video_number=video_id,
-                title=fetch_analytic_json['meta']['title'],
-                posted_at=fetch_analytic_json['meta']['posted_at'],
-                YouTube=fetch_analytic_json['meta']['YouTube'],
-                niconico=fetch_analytic_json['meta']['niconico']
+                title=fetch_analytic['meta']['title'],
+                posted_at=fetch_analytic['meta']['posted_at'],
+                YouTube=fetch_analytic['meta']['YouTube'],
+                niconico=fetch_analytic['meta']['niconico']
             )
             analytic, created = Analytic.objects.update_or_create(
                 video=video,
                 get_at=get_at,
                 defaults={
-                    "YouTubeView": fetch_analytic_json['stats']['view']['YouTube'],
-                    "YouTubeLike": fetch_analytic_json['stats']['like']['YouTube'],
-                    "YouTubeComment": fetch_analytic_json['stats']['comment']['YouTube'],
-                    "niconicoView": fetch_analytic_json['stats']['view']['niconico'],
-                    "niconicoLike": fetch_analytic_json['stats']['like']['niconico'],
-                    "niconicoComment": fetch_analytic_json['stats']['comment']['niconico'],
-                    "niconicoMylist": fetch_analytic_json['stats']['mylist']['niconico']
+                    "YouTubeView": fetch_analytic['stats']['view']['YouTube'],
+                    "YouTubeLike": fetch_analytic['stats']['like']['YouTube'],
+                    "YouTubeComment": fetch_analytic['stats']['comment']['YouTube'],
+                    "niconicoView": fetch_analytic['stats']['view']['niconico'],
+                    "niconicoLike": fetch_analytic['stats']['like']['niconico'],
+                    "niconicoComment": fetch_analytic['stats']['comment']['niconico'],
+                    "niconicoMylist": fetch_analytic['stats']['mylist']['niconico']
                 },
                 create_defaults={
-                    "YouTubeView": fetch_analytic_json['stats']['view']['YouTube'],
-                    "YouTubeLike": fetch_analytic_json['stats']['like']['YouTube'],
-                    "YouTubeComment": fetch_analytic_json['stats']['comment']['YouTube'],
-                    "niconicoView": fetch_analytic_json['stats']['view']['niconico'],
-                    "niconicoLike": fetch_analytic_json['stats']['like']['niconico'],
-                    "niconicoComment": fetch_analytic_json['stats']['comment']['niconico'],
-                    "niconicoMylist": fetch_analytic_json['stats']['mylist']['niconico']
+                    "YouTubeView": fetch_analytic['stats']['view']['YouTube'],
+                    "YouTubeLike": fetch_analytic['stats']['like']['YouTube'],
+                    "YouTubeComment": fetch_analytic['stats']['comment']['YouTube'],
+                    "niconicoView": fetch_analytic['stats']['view']['niconico'],
+                    "niconicoLike": fetch_analytic['stats']['like']['niconico'],
+                    "niconicoComment": fetch_analytic['stats']['comment']['niconico'],
+                    "niconicoMylist": fetch_analytic['stats']['mylist']['niconico']
                 }
             )
         return redirect('top')
