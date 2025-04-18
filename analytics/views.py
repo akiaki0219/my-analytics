@@ -4,6 +4,7 @@ from analytics.models import Analytic, Video, compareAnalytic
 from datetime import date
 from django.http import Http404
 from django.shortcuts import redirect, render
+from django.views.decorators.csrf import ensure_csrf_cookie
 
 
 def index(request):
@@ -169,6 +170,7 @@ def detail(request, video_number):
     return render(request, 'analytics/detail.html', context)
 
 
+@ensure_csrf_cookie
 def fetch(request):
     if request.method == "POST":
         fetch_analytics = FetchAnalytics()
