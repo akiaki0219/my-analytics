@@ -9,8 +9,12 @@
   <body>
     <h2>{{ video.title }}</h2>
     <p>posted_at: {{ video.posted_at }}</p>
+    {% if video.YouTube %}
     <a href="https://youtu.be/{{ video.YouTube }}">YouTube</a>
+    {% endif %}
+    {% if video.niconico %}
     <a href="https://nico.ms/{{ video.niconico }}">niconico</a>
+    {% endif %}
     <a href="https://akkiy-site.vercel.app/video/{{ video.video_number }}">Individual page</a>
     <table>
       <thead>
