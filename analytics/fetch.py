@@ -1,8 +1,8 @@
-import datetime
 import dotenv
 import json
 import os
 import requests
+from datetime import date
 from googleapiclient.discovery import build
 from supabase import create_client, Client
 
@@ -46,15 +46,16 @@ def fetchNicoNicoAPI(videoId: str | None):
     return data
 
 
-def fetchSupabaseAPI(supabaseClient: Client):
-    response = supabaseClient.table('video').select('id, title, posted_at, YouTube, niconico').eq('public', True).execute()
+def fetchSupabaseAPI(supabaseClient: Client, today: date):
+    response = supabaseClient.table('video').select('id, title, posted_at, YouTube, niconico').eq('public', True).lt('posted_at', today).execute()
     data = response.data
     return data
 
 
 def FetchAnalytics():
     supabaseClient: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
-    videoList = fetchSupabaseAPI(supabaseClient)
+    today = date.today()
+    videoList = fetchSupabaseAPI(supabaseClient, today)
     analytics = {}
     id = 0
     for video in videoList:
@@ -85,7 +86,7 @@ def FetchAnalytics():
             }
         }
         analytics[id] = {
-            "get_at": datetime.date.today(),
+            "get_at": today,
             "meta": meta,
             "stats": stats
         }

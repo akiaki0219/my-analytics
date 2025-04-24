@@ -41,7 +41,7 @@ def index(request):
             list_get_at.append(analytic.get_at)
         list_get_at.sort(reverse=True)
     if compare_date_str is not None:
-        compare_date = tuple(map(int, re.match(r'([0-9]+)年([0-9]+)月([0-9]+)日', compare_date_str).groups()))
+        compare_date = tuple(map(int, re.match(r'([0-9]+)-([0-9]+)-([0-9]+)', compare_date_str).groups()))
         compare_date_date = date(compare_date[0], compare_date[1], compare_date[2])
         query_strings['compare'] = compare_date_date
     else:
@@ -51,6 +51,7 @@ def index(request):
             if len(list_get_at) >= 2:
                 list_get_at = list_get_at[1:]
             compare_date_date = list_get_at[0]
+    list_get_at = list(map(str, list_get_at))
     sort_options = {
         'total': {
             'view': 'totalView',

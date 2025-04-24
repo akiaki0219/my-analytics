@@ -148,7 +148,7 @@ class AnalyticsViewTestCase(TestCase):
 
     def test_fetch_post1(self):
         supabaseClient = create_client(SUPABASE_URL, SUPABASE_KEY)
-        videoList = supabaseClient.table('video').select('id, title, posted_at, YouTube, niconico').eq('public', True).execute().data
+        videoList = supabaseClient.table('video').select('id, title, posted_at, YouTube, niconico').eq('public', True).lt('posted_at', date.today()).execute().data
         client = Client()
         response = client.post('/fetch/')
         response = client.get('/top/')
