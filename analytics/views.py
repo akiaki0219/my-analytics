@@ -208,7 +208,6 @@ def fetch(request):
             )
         for i in fetch_analytics:
             analytics = Analytic.objects.filter(video=Video.objects.get(video_number=fetch_analytics[i]['meta']['id']), get_at=date.today())
-            print(len(analytics))
             if len(analytics) >= 2:
                 analytics[1:].delete()
         return redirect('top')
