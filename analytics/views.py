@@ -40,16 +40,15 @@ def index(request):
         for analytic in Analytic.objects.filter(video=Video.objects.get(video_number=analytic_first.video.video_number)):
             list_get_at.append(analytic.get_at)
         list_get_at.sort(reverse=True)
+        if len(list_get_at) >= 2:
+            list_get_at = list_get_at[1:]
     if compare_date_str is not None:
         compare_date = tuple(map(int, re.match(r'([0-9]+)-([0-9]+)-([0-9]+)', compare_date_str).groups()))
         compare_date_date = date(compare_date[0], compare_date[1], compare_date[2])
-        query_strings['compare'] = compare_date_date
     else:
         if len(list_get_at) == 0:
             compare_date_date = today
         else:
-            if len(list_get_at) >= 2:
-                list_get_at = list_get_at[1:]
             compare_date_date = list_get_at[0]
     list_get_at = list(map(str, list_get_at))
     sort_options = {
@@ -207,5 +206,10 @@ def fetch(request):
                     "niconicoMylist": fetch_analytic['stats']['mylist']['niconico']
                 }
             )
+        for i in fetch_analytics:
+            analytics = Analytic.objects.filter(video=Video.objects.get(video_number=fetch_analytics[i]['meta']['id']), get_at=date.today())
+            print(len(analytics))
+            if len(analytics) >= 2:
+                analytics[1:].delete()
         return redirect('top')
     return render(request, 'analytics/fetch.html')
