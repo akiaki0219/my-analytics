@@ -184,6 +184,9 @@ def fetch(request):
                 YouTube=fetch_analytic['meta']['YouTube'],
                 niconico=fetch_analytic['meta']['niconico']
             )
+            analytics = Analytic.objects.filter(video=video, get_at=date.today())
+            if len(analytics) >= 2:
+                analytics[1:].delete()
             analytic, created = Analytic.objects.update_or_create(
                 video=video,
                 get_at=get_at,
